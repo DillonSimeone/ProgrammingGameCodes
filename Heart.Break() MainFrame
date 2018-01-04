@@ -1,0 +1,517 @@
+#Handy device for making it possible to copy strings to clipboard!
+var copy = Connect("Hotel_ServerBasement_Extractor_1")
+
+#Rooms to use for item storage, to avoid cluttered Inventory
+array storagerooms = ["DreamForest"]
+
+ClearText()
+if GetUser() == "Sebastian"
+    Print("Welcome, my lord. What do you wish to do?")
+    Print("1: Check Storages")
+    Print("2: Look through Rooms")
+    string input = Input("")
+    
+    if input == "1"
+        CheckStorage()
+    else if input == "2"
+        RoomMenu()
+    end
+    string asd = "Testing_ParkTrashCan_1"
+end
+
+var Copy(string text)
+    Print("Copying to Clipboard...")
+    copy.CopyToClipboard(text)    
+    Print("Copied!")
+end
+
+var CheckStorage()
+    array things
+    string selected
+        
+    loop room in storagerooms
+        array temp = GetThingsInRoom(room)
+        loop t in temp
+            Append(things, t)
+        end
+    end
+    
+    selected = Menus(things)
+    ClearText()
+    Print("What do you want to do with this item?")
+    Print("1: Move to Seb's Inventory")    
+end
+
+var GetStorage(string name)
+end
+
+var SendStorage(string name)
+end
+
+var Menus(array selections)
+    
+    number choice = 0
+    number max = Count(selections) - 1
+    string selected
+    bool select = false
+    
+    loop
+        if IsKeyPressed('up')
+            if choice != max
+                choice++
+                Sleep(0.1)
+            end
+        else if IsKeyPressed('down')
+            if choice != 0
+                choice--
+                Sleep(0.1)
+            end
+        else if IsKeyPressed("space")
+            select = True
+        end
+        selected = selections[choice]
+        Sleep(0.01)
+        ClearText()
+        Print("Selection " + choice + "/" + max + ": " + selected)
+        Print("Item type: " + GetTypeOfThing(selected))
+        Print("")
+        Print("Current Computer: " + Name())
+        Print("Up/Down: Next/Previous Item")
+        Print("Space: Select this Item")
+        if select
+            break
+        end
+    end
+    return selected
+end
+
+#Sends the named Object away!
+var MoveObjectToRandomRoom(string name)
+    SetPosition(name,GetRandomThingInRoom(GetRandomRoom())) 
+end
+
+var RoomMenu()
+    var rooms = GetAllRooms()
+    number max = (Count(rooms) - 1)
+    number choice = 0
+    Bool select = False
+    loop
+        if IsKeyPressed('up')
+            if choice != max
+                choice++
+                Sleep(0.1)
+            end
+        else if IsKeyPressed('down')
+            if choice != 0
+                choice--
+                Sleep(0.1)
+            end
+        else if IsKeyPressed("space")
+            select = True
+        end
+        Sleep(0.01)
+        ClearText()
+        Print("Room " + choice + "/" + max + ": " + rooms[choice])
+        Print("")
+        Print("Current Computer: " + Name())
+        Print("Up/Down: Next/Previous Room")
+        Print("Space: Select this room")
+        if select
+            break
+        end
+    end
+    ClearText()
+    string selectedRoom = rooms[choice]
+    select = False
+    choice = 0
+    Print("You've selected room: " + selectedRoom)
+    Print("1: Room Item Menu")
+    Print("2: Copy Room Name To Clipboard.")
+    String input = Input("")
+    if input == "1"
+        ClearText()
+        array things = GetThingsInRoom(selectedRoom)
+        if Count(things) != 0
+            max = Count(things) - 1
+        else
+            Print("No items in this room!")
+            break
+        end
+        loop
+            if IsKeyPressed('up')
+                if choice != max
+                    choice++
+                    Sleep(0.1)
+                end
+            else if IsKeyPressed('down')
+                if choice != 0
+                    choice--
+                    Sleep(0.1)
+                end
+            else if IsKeyPressed("right")
+                select = True
+            end
+            Sleep(0.01)
+            ClearText()
+            Print("Item " + choice + "/" + max + ": " + things[choice])
+            Print("Item type: " + GetTypeOfThing(things[choice]))
+            Print("")
+            Print("Current Computer: " + Name())
+            Print("Up/Down: Next/Previous Thing")
+            Print("Right: Select this Thing")
+            Print("")
+            Print("NOTE: No way to unrise the space flag")
+            Print("when Space is pressed for the first time.")
+            if select
+                break
+            end
+        end
+        ClearText()
+        string selectedItem = things[choice]
+        Print("You've selected item: " + selectedItem)
+        Print("")
+        Print("1: Copy Item Name to Clipboard.")
+        Print("2: Add Item to Player Inventory.")
+        input = Input("")
+        if input == "1"
+            Copy(selectedItem)
+        else if input == "2"
+            string userInventory = GetUser() + "_inventory"
+            Print("Teleporting Item into " + userInventory + "...")
+            SetPosition(selectedItem, "KeyRoom1")
+            Print("Done!")
+        end
+    else if input == "2"
+        Copy(selectedRoom)
+    end
+end
+
+var ConnectMainFrame()
+    var mf = Connect("MainFrame")
+    Print("1: Select Room.")
+    Print("2: Teleport Item to User.")
+    string input = Input("")
+    if input == "1"
+        array rooms = mf.GetAllRooms()
+        number max = Count(rooms) - 1
+        loop
+        end
+    else if input == "2"
+    end
+end
+
+var MainFrame(var option, String user)
+    if option == "1"
+        #Get All Things In Room User Is in
+        return ThingsCurrentRoom(user)
+    else if option == "2"
+        #Teleport Item to Room User is in.
+        SetPosition(CurrentRoom(user),"ASD") 
+    end    
+end
+
+var Help()
+    array help
+    Append(help, "Main Function: MainFrame(Var Option, String User)")
+    Append(help, "1: Get All Things In Room User Is In.")
+    Append(help, "2: Teleport Item to User.")
+end
+
+#Get all things in room User is currently in.
+var ThingsCurrentRoom(String user)
+    array things = GetThingsInRoom(CurrentRoom(user))
+    return things
+end
+
+#Gets Current Room User is in. (Do this work from other computers?)
+var CurrentRoom(String user)
+    return GetRoom(user)
+end
+
+
+
+var Test()
+    Print("Testing godly powers.")
+    Print("1: Select Random Items In Current Room.")
+    Print("2: Select Rooms Between X and Y.")
+    Print("3: Select Random Room.")
+    Print("4: Select Random Rooms.")
+    Print("5: Select Random People.")
+    Print("6: Select People between X and Y")
+    Print("7: Go through rooms one by one.")
+    String input = Input("")
+    if input == "1"
+        Print("How many items do you want to be displayed?")
+        number num = Input("")
+        loop x from 1 to num
+            Print("Item " + x + ":" + GetRandomThingCurrentRoom(GetUser()))
+        end
+    else if input == "2"
+        Print("Starting room number: ")
+        number x = Input("")
+        Print("Ending room number: ")
+        number y = Input("")
+        array rooms = GetAllRoomsBetween(x, y)
+        loop room in rooms
+            Print(room)
+        end
+    else if input == "3"
+        Print(GetRandomRoom())
+    else if input == "4"
+        Print("How many random rooms do you want to be displayed?")
+        number num = Input("")
+        loop x from 1 to num
+            Print("Room " + x + ":" + GetRandomRoom())
+        end
+    else if input == "5"
+        Print("How many random persons do you want to be displayed?")
+        number num = Input("")
+        loop x from 1 to num
+            Print("Person " + x + ":" + GetRandomPerson())
+        end
+    else if input == "6"
+        Print("Starting Person number: ")
+        number x = Input("")
+        Print("Ending Person number: ")
+        number y = Input("")
+        array people = GetPeopleBetween(x, y)
+        loop person in people
+            Print(person)
+        end
+    else if input == "7"
+        array rooms = AllRooms()
+        number num = 0
+        loop room in rooms
+            Print("Room " + num + ":" + room)
+            num++
+            Print("Enter: Next Room")
+            Print("1: Teleport to Random Item within Room.")
+            Print("2: List all items Within Room.")
+            var input = Input("")
+            
+            if input == "1"
+                String item = GetRandomThingInRoom(room)
+                Print("Selected Random Item in Room: " + item)
+                Print("Teleporting user...")
+                Print("3")
+                Sleep(1)
+                Print("2")
+                Sleep(1)
+                Print("1")
+                SetPosition(GetUser(), item)
+            else if input == "2"
+                array things = GetThingsInRoom(room)
+                if Count(things) != 0
+                    loop x from 0 to (Count(things)- 1)
+                        Print("Item " + x + ": " + things[x])
+                    end
+                end
+            end
+        end
+    end
+    Input("Press Enter To Start Over Again.")
+end
+
+var DrinkTest(String name)
+    ClearText()
+    return("Success!")
+end
+
+#Returns rooms from x to y
+var GetAllRoomsBetween(number x, number y)
+    array rooms = GetAllRooms()
+    number max = Count(rooms) - 1
+    
+    if y > max
+        y = max
+    else if y < 0
+        y = 0
+    else if y < x
+        y = x
+    end
+    
+    if x < 0
+        x = 0
+    else if x > max
+        x = max
+    end
+    
+    array selectedRooms
+    loop x from x to y
+        String selected = ("Room " + x + ":" + rooms[x])
+        Append(selectedRooms, selected)
+    end
+    return selectedRooms
+end
+
+#Returns random Room
+var GetRandomRoom()
+    array rooms = GetAllRooms()
+    number max = Count(rooms)
+    number random = max * Random()
+    random = Round(random)
+    return rooms[random]
+end
+
+var AllRooms()
+    array rooms = GetAllRooms()
+    return rooms
+end
+
+#Gets all things in room user is in.
+var GetThingsCurrentRoom(String user)
+    return GetThingsInRoom(CurrentRoom(user))
+end
+
+#Gets all computers in all rooms.
+var GetComputersAllRooms()
+    Print("Searching for all computers...")
+    array rooms = GetAllRooms()
+    array computers
+    loop room in rooms
+        array things = GetThingsInRoom(room)
+        loop thing in things
+            if GetTypeOfThing(thing) == "computer"
+                Append(computers, thing)
+                Print("Computer added:" + thing)
+            end
+        end
+    end
+    Print("Search is complete!")
+    return computers
+end
+
+#Connects to all computers in all rooms!
+var ConnectAllComputersAllRooms()
+    array computers = GetComputersAllRooms()
+    loop computer in computers
+        Print("Connecting to computer: " + computer)
+        Connect(computer)
+    end
+    Print("Connected to the universe!")
+    Slurp()
+end
+
+#Gets all computers in room user is in.
+var GetAllComputers(String user)
+    array things = GetThingsCurrentRoom(user)
+    array computers
+    loop thing in things
+        if GetTypeOfThing(thing) == "computer"
+            Append(computers, thing)
+        end
+    end
+    return computers
+end
+
+#Selects a single thing from things in a room.
+#TODO: Find a computer that can search for strings
+#Within strings.
+var GetThingCurrentRoom(number x, string user)
+    array things = GetThingsCurrentRoom(user)
+    return things[x]
+end
+
+var GetRandomThingInRoom(String name)
+    array things = GetThingsInRoom(name)
+    number random = Round(Count(things) * Random())
+    return things[random]
+end
+
+String GetRandomThingCurrentRoom(string user)
+    array things = GetThingsCurrentRoom(user)
+    number howManyThings = Count(things)
+    number randomSelect = howManyThings * Random()
+    return things[randomSelect]
+end
+
+#When this is called from any computers, your starting
+#place in the martix when you Slurp will be the MainFrame
+#instead of the device you used.
+var Teleport()
+        Slurp()
+end
+
+#Gets all doors in room user is in.
+var GetDoorsCurrentRoom(string user)
+    array things = GetThingsCurrentRoom(user)
+    array doors
+    loop thing in things
+        if GetTypeOfThing(thing) == "door"
+            Append(doors, thing)    
+        end    
+    end
+    return doors
+end
+
+#Connections Seb uses by default.
+var Connections()
+    array connections = ["Hotel_Room1_FuseBox"]
+    return connections
+end
+
+#Gets the names of everyone on the island!
+var names()
+    array names = GetPeople()
+    return names
+end
+
+#Gets a random person's name.
+var GetRandomPerson()
+    array names = GetPeople()
+    number max = Count(names) - 1
+    number random = Round(max * Random())
+    return names[random]
+end
+
+#Getes the names of persons between x and y
+var GetPeopleBetween(number x, number y)
+    array names = GetPeople()
+    number max = Count(names)
+   
+    if y > max
+        y = max
+    else if y < 0
+        y = 0
+    else if y < x
+        y = x
+    end
+    
+    if x < 0
+        x = 0
+    else if x > max
+        x = max
+    end
+    
+    array selectedNames
+    loop x from x to y
+        String selected = names[x]
+        Append(selectedNames, selected)
+    end
+    return selectedNames
+end
+
+#Loads up Seb's farvorite connections from memory
+void AddConnection(var x)
+    var exists = "f"
+    loop m in GetMemories()
+        if LoadMemory(m) == x
+            exists = "t"
+        else if exists == "f"
+        end
+    end
+end
+
+var God()
+    if(GetUser() == "Sebastian")
+        ClearText()
+        Print("User: " + GetUser())
+        Print("Computer: " + Name())
+        Print("Current Room: " + CurrentRoom(GetUser()))
+        Print("Current User Action: " + GetAction(GetUser()))
+        Print("Doors: " + GetDoorsCurrentRoom(GetUser()))
+        Print("Names: " + names())
+    else
+        Print("You're no God.") 
+    end
+end
