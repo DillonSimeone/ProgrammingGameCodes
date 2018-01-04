@@ -14,6 +14,8 @@ if GetUser() == "Sebastian"
     if input == "1"
         CheckStorage()
     else if input == "2"
+        Say("Loading Room Menu")
+        Sleep(1)
         RoomMenu()
     end
     string asd = "Testing_ParkTrashCan_1"
@@ -53,7 +55,7 @@ var Menus(array selections)
     number choice = 0
     number max = Count(selections) - 1
     string selected
-    bool select = false
+    bool select = False
     
     loop
         if IsKeyPressed('up')
@@ -66,18 +68,21 @@ var Menus(array selections)
                 choice--
                 Sleep(0.1)
             end
-        else if IsKeyPressed("space")
+        else if IsKeyPressed("right")
             select = True
+            Sleep(0.1)
         end
         selected = selections[choice]
         Sleep(0.01)
         ClearText()
         Print("Selection " + choice + "/" + max + ": " + selected)
-        Print("Item type: " + GetTypeOfThing(selected))
+        
+        #This breaks if attempting to use this with a room.
+        #Print("Item type: " + GetTypeOfThing(selected))
+        
         Print("")
-        Print("Current Computer: " + Name())
         Print("Up/Down: Next/Previous Item")
-        Print("Space: Select this Item")
+        Print("Right: Select this Item")
         if select
             break
         end
@@ -87,87 +92,44 @@ end
 
 #Sends the named Object away!
 var MoveObjectToRandomRoom(string name)
-    SetPosition(name,GetRandomThingInRoom(GetRandomRoom())) 
+    SetPosition(name,GetRandomThingInRandomRoom()) 
+end
+
+#I wonder how far down this recurisve function can go before stuff breaks.
+string GetRandomThingInRandomRoom()
+    string randomRoom = GetRandomRoom()
+    
+    loop room in storagerooms
+        if randomRoom == room
+            return GetRandomThingInRandomRoom()
+            break
+        end
+    end
+    
+    array things = GetThingsInRoom(randomRoom)
+    if Count(things) == 0
+        return GetRandomThingInRandomRoom()
+    else
+        return things[((Count(things) - 1)*Random())]
+    end
+    
 end
 
 var RoomMenu()
     var rooms = GetAllRooms()
-    number max = (Count(rooms) - 1)
-    number choice = 0
-    Bool select = False
-    loop
-        if IsKeyPressed('up')
-            if choice != max
-                choice++
-                Sleep(0.1)
-            end
-        else if IsKeyPressed('down')
-            if choice != 0
-                choice--
-                Sleep(0.1)
-            end
-        else if IsKeyPressed("space")
-            select = True
-        end
-        Sleep(0.01)
-        ClearText()
-        Print("Room " + choice + "/" + max + ": " + rooms[choice])
-        Print("")
-        Print("Current Computer: " + Name())
-        Print("Up/Down: Next/Previous Room")
-        Print("Space: Select this room")
-        if select
-            break
-        end
-    end
+    var selectedRoom = Menus(rooms)
+    
     ClearText()
-    string selectedRoom = rooms[choice]
-    select = False
-    choice = 0
     Print("You've selected room: " + selectedRoom)
     Print("1: Room Item Menu")
     Print("2: Copy Room Name To Clipboard.")
     String input = Input("")
-    if input == "1"
+    
+    if input == "1"    
         ClearText()
         array things = GetThingsInRoom(selectedRoom)
-        if Count(things) != 0
-            max = Count(things) - 1
-        else
-            Print("No items in this room!")
-            break
-        end
-        loop
-            if IsKeyPressed('up')
-                if choice != max
-                    choice++
-                    Sleep(0.1)
-                end
-            else if IsKeyPressed('down')
-                if choice != 0
-                    choice--
-                    Sleep(0.1)
-                end
-            else if IsKeyPressed("right")
-                select = True
-            end
-            Sleep(0.01)
-            ClearText()
-            Print("Item " + choice + "/" + max + ": " + things[choice])
-            Print("Item type: " + GetTypeOfThing(things[choice]))
-            Print("")
-            Print("Current Computer: " + Name())
-            Print("Up/Down: Next/Previous Thing")
-            Print("Right: Select this Thing")
-            Print("")
-            Print("NOTE: No way to unrise the space flag")
-            Print("when Space is pressed for the first time.")
-            if select
-                break
-            end
-        end
         ClearText()
-        string selectedItem = things[choice]
+        string selectedItem = Menus(things)
         Print("You've selected item: " + selectedItem)
         Print("")
         Print("1: Copy Item Name to Clipboard.")
